@@ -1,0 +1,55 @@
+<?php
+// Database Connection
+$host = "localhost";
+$db_user = "root";
+$db_pass = "";
+$db_name = "my_database";
+
+$conn = mysqli_connect($host, $db_user, $db_pass, $db_name);
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+
+$message = "";
+
+if (isset($_POST['submit'])) {
+    $username = mysqli_real_escape_string($conn, trim($_POST['username']));
+    $email = mysqli_real_escape_string($conn, trim($_POST['email']));
+    $password = $_POST['password'];
+    
+    if (!empty($username) && !empty($email) && !empty($password)) {
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+        
+        $sql = "INSERT INTO users (username, email, password) VALUES ('$username', '$email', '$hashed_password')";
+        if (mysqli_query($conn, $sql)) {
+            $message = "Registration successful!";
+        } else {
+            $message = "Error: " . mysqli_error($conn);
+        }
+    } else {
+        $message = "Please fill in all fields.";
+    }
+}
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registration Page</title>
+</head>
+<body>
+    <h2>Register</h2>
+    <p><?php echo $message; ?></p>
+    <form method="POST" action="">
+        <label>Username:</label><br>
+        <input type="text" name="username" required><br><br>
+        
+        <label>Email:</label><br>
+        <input type="email" name="email" required><br><br>
+        
+        <label>Password:</label><br>
+        <input type="password" name="password" required><br><br>
+        
+        <button type="submit" name="submit">Register</button>
+    </form>
+</body>
+</html>
